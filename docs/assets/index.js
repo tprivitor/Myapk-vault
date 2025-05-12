@@ -1,9 +1,8 @@
 
-function createElem(tag, className, content) {
-  var el = document.createElement(tag);
-  if (className) el.className = className;
-  if (content) el.innerHTML = content;
-  return el;
+function log(msg) {
+  console.log(msg);
+  const logDiv = document.getElementById('output');
+  logDiv.innerHTML += "<div style='background:#eee;padding:6px;margin-top:4px;border-radius:4px'>" + msg + "</div>";
 }
 
 document.getElementById('apkInput').addEventListener('change', async function (event) {
@@ -12,48 +11,46 @@ document.getElementById('apkInput').addEventListener('change', async function (e
   output.innerHTML = '';
 
   if (!window.JSZip) {
-    output.innerHTML = "JSZip failed to load.";
+    log("JSZip failed to load.");
     return;
   }
 
+  log("JSZip loaded.");
+
   for (const file of files) {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    let fileName = "<strong>File:</strong> " + file.name + "<br>";
-    let fileSize = "<strong>Size:</strong> " + (file.size / (1024 * 1024)).toFixed(2) + " MB<br>";
-
-    let pkgInfo = "<strong>Package:</strong> loading...<br>";
-    let verInfo = "<strong>Version:</strong> loading...<br>";
-    let permList = "<strong>Permissions:</strong><ul><li>loading...</li></ul>";
-
-    card.innerHTML = fileName + fileSize + pkgInfo + verInfo + permList;
-    output.appendChild(card);
+    log("Reading: " + file.name);
 
     try {
       const buffer = await file.arrayBuffer();
-      const zip = await JSZip.loadAsync(buffer);
-      const manifestFile = zip.file("AndroidManifest.xml");
+      log("Buffer loaded.");
 
-      if (!manifestFile) {
-        card.innerHTML += "<div>Manifest not found</div>";
-        continue;
+      const zip = await JSZip.loadAsync(buffer);
+      log("APK unzipped.");
+
+      const manifestFile = zip.file("AndroidManifest.xml");
+      if (manifestFile) {
+        log("Manifest found.");
+
+        const manifestBuffer = await manifestFile.async("uint8array");
+        const preview = Array.from(manifestBuffer.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join(' ');
+
+        const html = "<div class='card'>" +
+          "<strong>File:</strong> " + file.name + "<br>" +
+          "<strong>Size:</strong> " + (file.size / (1024 * 1024)).toFixed(2) + " MB<br>" +
+          "<strong>Manifest:</strong> Found<br>" +
+          "<strong>Preview:</strong> " + preview + "<br>" +
+          "<strong>Package:</strong> [decoding next]<br>" +
+          "<strong>Version:</strong> [decoding next]<br>" +
+          "<strong>Permissions:</strong><ul><li>[decoding next]</li></ul>" +
+          "</div>";
+
+        output.innerHTML += html;
+      } else {
+        log("Manifest NOT found.");
       }
 
-      const manifestBuffer = await manifestFile.async("uint8array");
-      const hexPreview = Array.from(manifestBuffer.slice(0, 8)).map(function(b) {
-        return b.toString(16).padStart(2, '0');
-      }).join(' ');
-
-      card.innerHTML = fileName +
-        fileSize +
-        "<strong>AndroidManifest.xml:</strong> Yes (binary)<br>" +
-        "<strong>Preview:</strong> " + hexPreview + "<br>" +
-        "<strong>Package:</strong> [binary decoded soon]<br>" +
-        "<strong>Version:</strong> [binary decoded soon]<br>" +
-        "<strong>Permissions:</strong><ul><li>[binary decoded soon]</li></ul>";
-    } catch (err) {
-      card.innerHTML += "<div>Error: " + err.message + "</div>";
+    } catch (e) {
+      log("Error: " + e.message);
     }
   }
 });
