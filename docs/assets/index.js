@@ -1,0 +1,1 @@
+console.log('APK Vault is running');
