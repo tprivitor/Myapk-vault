@@ -4,13 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>APK Metadata Vault</title>
-    <script type="module" crossorigin src="./assets/index.js"></script>
-    <link rel="stylesheet" href="./assets/index.css">
+    <link rel="stylesheet" href="./assets/index.css" />
+    <script type="module" src="./assets/index.js"></script>
   </head>
   <body>
-    <div id="root">
+    <div class="container">
       <h1>APK Metadata Vault</h1>
-      <p>If you see this, the GitHub Pages deployment is working.</p>
+      <input type="file" id="apkInput" multiple accept=".apk" />
+      <div id="output" class="output"></div>
+      <button id="exportBtn" style="display:none;">Export to CSV</button>
     </div>
   </body>
 </html>
