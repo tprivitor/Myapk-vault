@@ -1,5 +1,1 @@
-
-body { font-family: sans-serif; padding: 2rem; background: #f0f0f0; }
-.container { max-width: 700px; margin: auto; }
-.card { background: white; padding: 1rem; margin-top: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-button.scan-btn { margin-top: 10px; padding: 5px 10px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; }
+body { font-family: sans-serif; padding: 2rem; background: #f8f8f8; } .container { max-width: 700px; margin: auto; }

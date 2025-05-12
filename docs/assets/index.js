@@ -1,37 +1,37 @@
 
+function log(msg) {
+  document.getElementById('log').textContent += msg + "\n";
+}
+
 document.getElementById('apkInput').addEventListener('change', async function (event) {
+  log("File selected.");
+
   const files = Array.from(event.target.files);
-  const output = document.getElementById('output');
-  output.innerHTML = '';
+  if (!window.JSZip) {
+    log("JSZip not loaded.");
+    return;
+  } else {
+    log("JSZip loaded.");
+  }
 
   for (const file of files) {
     try {
+      log("Reading file: " + file.name);
       const buffer = await file.arrayBuffer();
+      log("Loaded file buffer.");
+
       const zip = await JSZip.loadAsync(buffer);
+      log("APK unzipped.");
 
-      const manifestFile = zip.file('AndroidManifest.xml');
-      const hasManifest = manifestFile ? 'Yes (binary)' : 'No';
+      const manifest = zip.file("AndroidManifest.xml");
+      if (manifest) {
+        log("AndroidManifest.xml found.");
+      } else {
+        log("No AndroidManifest.xml found.");
+      }
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <strong>File:</strong> ${file.name}<br>
-        <strong>Size:</strong> ${(file.size / (1024 * 1024)).toFixed(2)} MB<br>
-        <strong>AndroidManifest.xml:</strong> ${hasManifest}<br>
-        <strong>Package:</strong> <span class="package">parser coming</span><br>
-        <strong>Version:</strong> <span class="version">parser coming</span><br>
-        <strong>Permissions:</strong> <span class="perms">parser coming</span><br>
-        <button class="scan-btn">Scan Online</button>
-      `;
-
-      const scanBtn = card.querySelector('.scan-btn');
-      scanBtn.addEventListener('click', () => {
-        alert('Online scan coming soon...');
-      });
-
-      output.appendChild(card);
     } catch (e) {
-      console.error('Error reading APK:', e);
+      log("Error: " + e.message);
     }
   }
 });
