@@ -9,7 +9,7 @@ function handleFiles(event) {
   results = files.map(file => {
     const name = file.name;
     const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    const modFlag = /mod|\[m0d\]/i.test(name) ? "[MOD]" : "";
+    const modFlag = /(mod|m0d|mod|noad|unlocked|premium|pro|crack|patch|paid|remove ads|crackshash|full)/i.test(name) ? "[MOD]" : "";
     const parts = name.replace(/\.apk$/i, "").split(/[_\-\s]+/);
     const appName = parts[0];
     const version = parts.find(p => /^\d+(\.\d+)+$/.test(p)) || "Unknown";
