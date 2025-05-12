@@ -1,1 +1,1 @@
-console.log('APK Vault is running');
+console.log('APK Metadata Vault loaded.');
