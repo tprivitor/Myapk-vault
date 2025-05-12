@@ -1,6 +1,9 @@
 
-function log(msg) {
-  console.log(msg);
+function createElem(tag, className, content) {
+  var el = document.createElement(tag);
+  if (className) el.className = className;
+  if (content) el.innerHTML = content;
+  return el;
 }
 
 document.getElementById('apkInput').addEventListener('change', async function (event) {
@@ -16,13 +19,15 @@ document.getElementById('apkInput').addEventListener('change', async function (e
   for (const file of files) {
     const card = document.createElement('div');
     card.className = 'card';
-    card.innerHTML = \`
-      <strong>File:</strong> \${file.name}<br>
-      <strong>Size:</strong> \${(file.size / (1024 * 1024)).toFixed(2)} MB<br>
-      <strong>Package:</strong> <span class="package">loading...</span><br>
-      <strong>Version:</strong> <span class="version">loading...</span><br>
-      <strong>Permissions:</strong><ul class="perms"><li>loading...</li></ul>
-    \`;
+
+    let fileName = "<strong>File:</strong> " + file.name + "<br>";
+    let fileSize = "<strong>Size:</strong> " + (file.size / (1024 * 1024)).toFixed(2) + " MB<br>";
+
+    let pkgInfo = "<strong>Package:</strong> loading...<br>";
+    let verInfo = "<strong>Version:</strong> loading...<br>";
+    let permList = "<strong>Permissions:</strong><ul><li>loading...</li></ul>";
+
+    card.innerHTML = fileName + fileSize + pkgInfo + verInfo + permList;
     output.appendChild(card);
 
     try {
@@ -31,24 +36,24 @@ document.getElementById('apkInput').addEventListener('change', async function (e
       const manifestFile = zip.file("AndroidManifest.xml");
 
       if (!manifestFile) {
-        card.querySelector(".package").textContent = "Manifest missing";
-        card.querySelector(".version").textContent = "N/A";
-        card.querySelector(".perms").innerHTML = "<li>N/A</li>";
+        card.innerHTML += "<div>Manifest not found</div>";
         continue;
       }
 
       const manifestBuffer = await manifestFile.async("uint8array");
+      const hexPreview = Array.from(manifestBuffer.slice(0, 8)).map(function(b) {
+        return b.toString(16).padStart(2, '0');
+      }).join(' ');
 
-      // Basic binary parser logic (placeholder) — real decoding needs apk-parser-js or WASM
-      const pkg = Array.from(manifestBuffer.slice(0, 8)).map(b => b.toString(16)).join(' ');
-      card.querySelector(".package").textContent = "Binary manifest parsed (preview: " + pkg + ")";
-      card.querySelector(".version").textContent = "Binary XML - full parser coming";
-      card.querySelector(".perms").innerHTML = "<li>Declared in binary XML</li>";
-
+      card.innerHTML = fileName +
+        fileSize +
+        "<strong>AndroidManifest.xml:</strong> Yes (binary)<br>" +
+        "<strong>Preview:</strong> " + hexPreview + "<br>" +
+        "<strong>Package:</strong> [binary decoded soon]<br>" +
+        "<strong>Version:</strong> [binary decoded soon]<br>" +
+        "<strong>Permissions:</strong><ul><li>[binary decoded soon]</li></ul>";
     } catch (err) {
-      card.querySelector(".package").textContent = "Error reading";
-      card.querySelector(".version").textContent = "Error";
-      card.querySelector(".perms").innerHTML = "<li>Error</li>";
+      card.innerHTML += "<div>Error: " + err.message + "</div>";
     }
   }
 });
