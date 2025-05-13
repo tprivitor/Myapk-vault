@@ -2,6 +2,7 @@
 document.getElementById('apkInput').addEventListener('change', async function (event) {
   const files = Array.from(event.target.files);
   const output = document.getElementById('output');
+  output.innerHTML = '';
 
   for (const file of files) {
     const card = document.createElement('div');
@@ -22,9 +23,30 @@ document.getElementById('apkInput').addEventListener('change', async function (e
       }
 
       const manifestBuffer = await manifestFile.async("uint8array");
+      const xmlString = window.bxmlParser.parseBytes(manifestBuffer);
 
-      // This is a placeholder until real binary-to-text parser is available
-      throw new Error("binaryXmlToText not yet implemented");
+      const parser = new window.fxparser.XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: "@_"
+      });
+
+      const manifestJson = parser.parse(xmlString);
+      const manifest = manifestJson.manifest;
+      const pkgName = manifest["@_package"] || "unknown";
+      const versionCode = manifest["@_android:versionCode"] || "unknown";
+      const versionName = manifest["@_android:versionName"] || "unknown";
+
+      const perms = Array.isArray(manifest["uses-permission"])
+        ? manifest["uses-permission"].map(p => p["@_android:name"])
+        : [manifest["uses-permission"]?.["@_android:name"] || "none"];
+
+      card.setAttribute("data-permissions", perms.join(" ").toLowerCase());
+
+      html += "<strong>Package:</strong> " + pkgName + "<br>";
+      html += "<strong>Version:</strong> " + versionName + " (" + versionCode + ")<br>";
+      html += "<strong>Permissions:</strong><ul>";
+      perms.forEach(p => html += "<li>" + p + "</li>");
+      html += "</ul>";
 
     } catch (e) {
       html += "<strong>Error:</strong> " + e.message + "<br>";
