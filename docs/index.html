@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/fast-xml-parser@4.2.5/dist/fxparser.min.js"></script>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -10,11 +12,10 @@
   <div class="container">
     <h1>APK Metadata Vault</h1>
     <input type="file" id="apkInput" multiple accept=".apk" />
-    <input type="text" id="permFilter" placeholder="Filter by permission (e.g. SMS)" />
     <div id="output" class="output"></div>
   </div>
   <script src="./assets/jszip.min.js"></script>
-  <script src="./assets/axp.min.js"></script>
   <script src="./assets/index.js"></script>
+  <script src="./assets/axp.min.js"></script>
 </body>
 </html>
