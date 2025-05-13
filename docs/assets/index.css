@@ -1,4 +1,6 @@
 
 body { font-family: sans-serif; padding: 2rem; background: #f0f0f0; }
 .container { max-width: 700px; margin: auto; }
+input[type="text"] { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; }
 .card { background: white; padding: 1rem; margin-top: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+button.scan-btn { margin-top: 8px; padding: 6px 12px; background: #444; color: white; border: none; border-radius: 5px; cursor: pointer; }
